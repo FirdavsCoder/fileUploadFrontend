@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, ChangeEvent, FormEvent, useRef } from "react";
 import axios from "@/utils/axios";
 import {
   Box,
@@ -11,13 +11,14 @@ import {
   Icon,
   Flex,
 } from "@chakra-ui/react";
-import { FiUploadCloud } from "react-icons/fi"; 
-import { AiOutlineFileZip } from "react-icons/ai"; 
+import { FiUploadCloud } from "react-icons/fi";
+import { AiOutlineFileZip } from "react-icons/ai";
 
 const FileUpload: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const toast = useToast(); 
+  const toast = useToast();
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -71,13 +72,16 @@ const FileUpload: React.FC = () => {
         position: "top-right",
       });
 
-      
       setFile(null);
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
     } catch (error) {
       setIsLoading(false);
       toast({
         title: "Upload Failed.",
-        description: "There was an issue with the file upload. Please try again.",
+        description:
+          "There was an issue with the file upload. Please try again.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -108,7 +112,6 @@ const FileUpload: React.FC = () => {
           Upload ZIP File
         </Text>
 
-        {/* Кастомизированное поле для загрузки */}
         <Box
           position="relative"
           border="2px dashed #ccc"
@@ -123,6 +126,7 @@ const FileUpload: React.FC = () => {
           _hover={{ borderColor: "teal.400", cursor: "pointer" }}
         >
           <Input
+            ref={inputRef}
             type="file"
             accept=".zip"
             onChange={handleFileChange}
